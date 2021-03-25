@@ -84,7 +84,9 @@ export default function Post({ post }: PostProps) {
           <h2>Carregando...</h2>
         ) : (
           <article className={styles.post}>
-            <img src={post.data.banner.url} alt={post.data.title}/>
+            <figure>
+              <img src={post.data.banner.url} alt={post.data.title}/>
+            </figure>
 
             <div className={commonStyles.container}>
               <h1>{post.data.title}</h1>

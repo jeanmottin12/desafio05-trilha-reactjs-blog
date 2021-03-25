@@ -52,43 +52,45 @@ export default function Home({ postsPagination }: HomeProps) {
         <title>Home | spacetraveling</title>
       </Head>
 
-      <main className={`${styles.mainContainer} ${commonStyles.container}`}>
-        <img src="logo.svg" alt="logo"/>
+      <main className={commonStyles.container}>
+        <div className={styles.mainContainer}>
+          <img src="logo.svg" alt="logo"/>
 
-        <ul>
-          {posts.map(post => (
-            <li key={post.uid}>
-              <Link href={`/post/${post.uid}`}>
-                <a>
-                  <strong>{post.data.title}</strong>
-                  <p>{post.data.subtitle}</p>
-                  <div>
-                    <span>
-                      <FiCalendar />
-                      {format(
-                        new Date(post.first_publication_date),
-                        "d MMM y",
-                        {
-                          locale: ptBR
-                        }
-                      )}
-                    </span>
-                    <span>
-                      <FiUser />
-                      {post.data.author}
-                    </span>
-                  </div>
-                </a>
-              </Link>
-            </li>
-          ))}
-        </ul>
+          <ul>
+            {posts.map(post => (
+              <li key={post.uid}>
+                <Link href={`/post/${post.uid}`}>
+                  <a>
+                    <strong>{post.data.title}</strong>
+                    <p>{post.data.subtitle}</p>
+                    <div>
+                      <span>
+                        <FiCalendar />
+                        {format(
+                          new Date(post.first_publication_date),
+                          "d MMM y",
+                          {
+                            locale: ptBR
+                          }
+                        )}
+                      </span>
+                      <span>
+                        <FiUser />
+                        {post.data.author}
+                      </span>
+                    </div>
+                  </a>
+                </Link>
+              </li>
+            ))}
+          </ul>
 
-        {hasMore && (
-          <button onClick={handleLoadMore}>
-            Carregar mais posts
-          </button>
-        )}
+          {hasMore && (
+            <button onClick={handleLoadMore}>
+              Carregar mais posts
+            </button>
+          )}
+        </div>
       </main>
     </>
   );
@@ -99,7 +101,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const postsResponse = await prismic.query([
     Prismic.predicates.at('document.type', 'posts')
   ], {
-    pageSize: 1
+    pageSize: 2
   });
 
   const postsPagination = {
