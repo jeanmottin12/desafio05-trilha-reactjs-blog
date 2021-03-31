@@ -22,6 +22,7 @@ import { Comments } from '../../components/Comments';
 interface Post {
   uid?: string;
   first_publication_date: string | null;
+  last_publication_date: string | null;
   data: {
     title: string;
     banner: {
@@ -41,10 +42,12 @@ interface PostProps {
   post: Post;
   next: Post;
   prev: Post;
+  preview: boolean
 }
 
-export default function Post({ post, next, prev }: PostProps) {
+export default function Post({ post, next, prev, preview }: PostProps) {
   const router = useRouter();
+  console.log(post)
 
   const estimatedReadTime = useMemo(() => {
     if (router.isFallback) {
@@ -120,6 +123,18 @@ export default function Post({ post, next, prev }: PostProps) {
               </li>
             </ul>
 
+            {post.last_publication_date && (
+              <span className={styles.editDate}>
+                {format(
+                  new Date(post.last_publication_date),
+                  "'* editado em 'd MMM y', às ' kk':'mm",
+                  {
+                    locale: ptBR
+                  }
+                )}
+              </span>
+            )}
+
             {post.data.content.map((content, index) => (
               <div key={index} className={styles.postContent}>
                 <h2>{content.heading}</h2>
@@ -152,6 +167,14 @@ export default function Post({ post, next, prev }: PostProps) {
           </div>
         </div>
         <Comments />
+
+        {preview && (
+          <aside className={`${styles.previewButton} ${commonStyles.container}`}>
+            <Link href="/api/exit-preview">
+              <a>Sair do modo Preview</a>
+            </Link>
+          </aside>
+        )}
       </main>
     </>
   )
@@ -177,11 +200,17 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = async ({
+  params,
+  preview = false,
+  previewData
+}) => {
   const prismic = getPrismicClient();
   const { slug } = params;
 
-  const response = await prismic.getByUID('posts', String(slug), {});
+  const response = await prismic.getByUID('posts', String(slug), {
+    ref: previewData?.ref ?? null
+  });
 
   const prevPost = (
     await prismic.query([
@@ -210,6 +239,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       post: response,
       prev: prevPost ? prevPost : null,
       next: nextPost ? nextPost : null,
+      preview
     },
     revalidate: 60 * 60 // 1 hora
   }
